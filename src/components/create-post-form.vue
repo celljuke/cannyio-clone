@@ -40,12 +40,14 @@ export default {
   },
   methods: {
     addPost () {
-      var newPostRef = postsRef.push()
-      this.post.createdAt = new Date()
-      newPostRef.set(this.post)
-      this.post = {
-        title: '',
-        details: ''
+      if (this.post.title !== '') {
+        var newPostRef = postsRef.push()
+        this.post.createdAt = new Date()
+        newPostRef.set(this.post)
+        this.post = {
+          title: '',
+          details: ''
+        }
       }
     }
   }
