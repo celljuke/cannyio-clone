@@ -21,6 +21,7 @@
 
 <script>
 import utils from '@/utils'
+// import firebase from 'firebase'
 
 let db = utils.firebase.db
 let postsRef = db.ref('posts')
@@ -31,7 +32,8 @@ export default {
     return {
       post: {
         title: '',
-        details: ''
+        details: '',
+        createdAt: new Date().getTime()
       }
     }
   },
@@ -42,7 +44,7 @@ export default {
     addPost () {
       if (this.post.title !== '') {
         var newPostRef = postsRef.push()
-        this.post.createdAt = new Date()
+        console.log(this.post)
         newPostRef.set(this.post)
         this.post = {
           title: '',
