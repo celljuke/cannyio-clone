@@ -1,10 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/views/home'
-import VueFire from 'vuefire'
+import PostDetail from '@/views/post-detail'
 
 Vue.use(Router)
-Vue.use(VueFire)
 
 export default new Router({
   routes: [
@@ -12,6 +11,11 @@ export default new Router({
       path: '/',
       name: 'Home',
       component: Home
+    },
+    {
+      path: '/post-detail/:postId',
+      name: 'PostDetail',
+      component: PostDetail
     }
   ]
 })

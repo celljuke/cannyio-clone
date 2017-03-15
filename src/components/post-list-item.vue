@@ -4,7 +4,7 @@
       <div class="up-vote"></div>
       <span>{{post.votes ? post.votes.length : '0'}}</span>
     </div>
-    <div class="post-body">
+    <div class="post-body" @click="openDetail(post)">
       <div class="post-title">{{post.title}}</div>
     </div>
     <div class="post-comments"></div>
@@ -13,6 +13,7 @@
 
 <script>
 import utils from '@/utils'
+import router from '@/router'
 
 let db = utils.firebase.db
 let postsRef = db.ref('posts')
@@ -37,6 +38,9 @@ export default {
       this.$firebaseRefs.posts.child(post['.key']).update({
         votes: newVotes
       })
+    },
+    openDetail (post) {
+      router.push({name: 'PostDetail', params: {postId: post['.key']}})
     }
   }
 }
@@ -93,6 +97,7 @@ export default {
       .post-title {
         font-size: 17px;
         line-height: 24px;
+        cursor: pointer;
       }
     }
   }

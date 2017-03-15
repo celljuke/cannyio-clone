@@ -3,9 +3,9 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import vuefire from 'vuefire'
+import VueFire from 'vuefire'
 
-Vue.use(vuefire)
+Vue.use(VueFire)
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */
