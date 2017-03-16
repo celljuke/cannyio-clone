@@ -64,29 +64,46 @@ exports.token = functions.https.onRequest((req, res) => {
         throw new Error('State validation failed');
       }
       console.log('Received auth code:', req.query.code);
-      console.log('axios start:');
-      axios.post('https://api.envato.com/token', qs.stringify({
-        grant_type: 'authorization_code',
-        code: req.query.code,
-        client_id: functions.config().envato.client_id,
-        client_secret: functions.config().envato.client_secret
-      }),{ headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
-        .then(function (results) {
-          console.log('Auth code exchange result received:', results);
-          const accessToken = results.access_token;
-          const instagramUserID = results.user.id;
-          const profilePic = results.user.profile_picture;
-          const userName = results.user.full_name;
+      console.log('token post start:');
 
-          // Create a Firebase account and get the Custom Auth Token.
-          createFirebaseAccount(instagramUserID, userName, profilePic, accessToken).then(firebaseToken => {
-            // Serve an HTML page that signs the user in and updates the user profile.
-            res.jsonp({token: firebaseToken});
+      var envatoUser = {}
+
+      oauth2.authorizationCode.getToken({
+        code: req.query.code,
+        redirect_uri: OAUTH_REDIRECT_URI
+      }).then(results => {
+        console.log('Auth code exchange result received:', results);
+        const accessToken = results.access_token;
+        const refreshToken = results.refresh_token;
+
+        const AuthStr = 'Bearer '.concat(accessToken);
+        axios.get('https://api.envato.com/v1/market/private/user/username.json', { headers: { Authorization: AuthStr } })
+          .then(response => {
+            // If request is good...
+            console.log(response.data);
+            envatoUser.username = response.data.username;
+
+            axios.get('https://api.envato.com/v1/market/private/user/account.json', { headers: { Authorization: AuthStr } })
+              .then(response => {
+                var userData = response.data.account;
+                envatoUser.displayName = userData.firstname + ' ' + userData.surname;
+                envatoUser.userId = envatoUser.username + crypto.randomBytes(20).toString('hex');
+
+                createFirebaseAccount(envatoUser.userId, envatoUser.displayName, AuthStr).then(firebaseToken => {
+                  // Serve an HTML page that signs the user in and updates the user profile.
+                  res.jsonp({token: firebaseToken});
+                });
+
+              })
+              .catch((error) => {
+                console.log('error ' + error);
+              });
+          })
+          .catch((error) => {
+            console.log('error ' + error);
           });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+
+      });
 
     });
   } catch (error) {
@@ -94,7 +111,7 @@ exports.token = functions.https.onRequest((req, res) => {
   }
 });
 
-function createFirebaseAccount(envatoID, displayName, photoURL, accessToken) {
+function createFirebaseAccount(envatoID, displayName, accessToken) {
   // The UID we'll assign to the user.
   const uid = `envato:${envatoID}`;
 
@@ -104,15 +121,13 @@ function createFirebaseAccount(envatoID, displayName, photoURL, accessToken) {
 
   // Create or update the user account.
   const userCreationTask = admin.auth().updateUser(uid, {
-    displayName: displayName,
-    photoURL: photoURL
+    displayName: displayName
   }).catch(error => {
     // If user does not exists we create it.
     if (error.code === 'auth/user-not-found') {
       return admin.auth().createUser({
         uid: uid,
         displayName: displayName,
-        photoURL: photoURL
       });
     }
     throw error;

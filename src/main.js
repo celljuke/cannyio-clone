@@ -4,7 +4,9 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import VueFire from 'vuefire'
+import VueJsonp from 'vue-jsonp'
 
+Vue.use(VueJsonp)
 Vue.use(VueFire)
 Vue.config.productionTip = false
 

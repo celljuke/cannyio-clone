@@ -4,12 +4,14 @@
       <div class="home__container__sidebar">
         <board-details v-on:openLoginModal="openLoginModal"></board-details>
         <div><a class="powered-by">powered by celljuke</a></div>
+        <div v-if="userExists">{{currentUser.displayName}}</div>
+        <div v-if="userExists"><a href="javascript:;" @click="signOut()">sign out</a></div>
       </div>
       <div class="home__container__main-container">
         <post-list-view></post-list-view>
       </div>
     </div>
-    <div class="modal-overlay" v-if="isLoginNeed">
+    <div class="modal-overlay" v-if="isLoginNeed && !userExists">
       <div class="account-modal">
         <h1>Sign up for Canny-Clone with:</h1>
         <a href="javascript:;" @click="openAuthPopup">Use Envato Account</a>
@@ -21,12 +23,15 @@
 <script>
 import boardDetails from '@/components/board-details'
 import postListView from '@/components/post-list-view'
+import firebase from 'firebase'
 
 export default {
   name: 'home',
   data () {
     return {
-      isLoginNeed: false
+      isLoginNeed: false,
+      userExists: false,
+      currentUser: {}
     }
   },
   components: {
@@ -39,7 +44,21 @@ export default {
     },
     openLoginModal () {
       this.isLoginNeed = true
+    },
+    onAuthStateChanged (user) {
+      if (user) {
+        this.userExists = true
+        this.currentUser = user
+      }
+    },
+    signOut () {
+      firebase.auth().signOut()
+      this.userExists = false
+      this.isLoginNeed = false
     }
+  },
+  mounted () {
+    firebase.auth().onAuthStateChanged(this.onAuthStateChanged.bind(this))
   }
 }
 
