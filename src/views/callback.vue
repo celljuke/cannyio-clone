@@ -21,10 +21,8 @@ export default {
     this.code = this.$route.query.code
     this.state = this.$route.query.state
     if (this.code) {
-
       // if we want to use cloud functions, we have to use this function
       // this.getToken()
-
 
       // this is for try from web
       var vm = this
