@@ -13,9 +13,9 @@
 
 <script>
 import utils from '@/utils'
-import router from '@/router'
 
 let db = utils.firebase.db
+let auth = utils.firebase.auth
 let postsRef = db.ref('posts')
 
 export default {
@@ -30,17 +30,19 @@ export default {
   },
   methods: {
     addVote (post) {
-      var newVotes = [{userId: 1}]
-      if (post.votes) {
-        newVotes = post.votes
-        newVotes.push({userId: 1})
+      if (auth.currentUser) {
+        var newVotes = [{userId: 1}]
+        if (post.votes) {
+          newVotes = post.votes
+          newVotes.push({userId: 1})
+        }
+        this.$firebaseRefs.posts.child(post['.key']).update({
+          votes: newVotes
+        })
       }
-      this.$firebaseRefs.posts.child(post['.key']).update({
-        votes: newVotes
-      })
     },
     openDetail (post) {
-      router.push({name: 'PostDetail', params: {postId: post['.key']}})
+      this.$router.push({name: 'PostDetail', params: {postId: post['.key']}})
     }
   }
 }

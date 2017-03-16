@@ -1,6 +1,6 @@
 <template>
   <div class="board-details card">
-    <create-post-form></create-post-form>
+    <create-post-form v-on:openLoginModal="openLoginModal"></create-post-form>
   </div>
 </template>
 
@@ -10,6 +10,11 @@ export default {
   name: 'board-details',
   components: {
     createPostForm
+  },
+  methods: {
+    openLoginModal () {
+      this.$emit('openLoginModal')
+    }
   }
 }
 </script>

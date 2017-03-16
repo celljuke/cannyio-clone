@@ -2,11 +2,17 @@
   <div class="home">
     <div class="home__container">
       <div class="home__container__sidebar">
-        <board-details></board-details>
+        <board-details v-on:openLoginModal="openLoginModal"></board-details>
         <div><a class="powered-by">powered by celljuke</a></div>
       </div>
       <div class="home__container__main-container">
         <post-list-view></post-list-view>
+      </div>
+    </div>
+    <div class="modal-overlay" v-if="isLoginNeed">
+      <div class="account-modal">
+        <h1>Sign up for Canny-Clone with:</h1>
+        <a href="javascript:;" @click="openAuthPopup">Use Envato Account</a>
       </div>
     </div>
   </div>
@@ -20,12 +26,20 @@ export default {
   name: 'home',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      isLoginNeed: false
     }
   },
   components: {
     boardDetails,
     postListView
+  },
+  methods: {
+    openAuthPopup () {
+      window.open('popup.html', 'name', 'height=585,width=400')
+    },
+    openLoginModal () {
+      this.isLoginNeed = true
+    }
   }
 }
 
@@ -84,6 +98,38 @@ export default {
         flex: 1;
       }
     }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 100vw;
+      max-width: 100vw;
+      width: 100vw;
+      min-height: 100vh;
+      max-height: 100vh;
+      height: 100vh;
+      z-index: 100;
+      background: rgba(0,0,0,.4);
+      overflow: hidden;
+
+      .account-modal {
+        background: #fff;
+        width: 100%;
+        max-width: 440px;
+        border-radius: 3px;
+        padding: 30px;
+
+        h1 {
+          font-size: 17px;
+          line-height: 24px;
+
+        }
+      }
+    }
+
   }
 </style>
 

@@ -21,9 +21,9 @@
 
 <script>
 import utils from '@/utils'
-// import firebase from 'firebase'
 
 let db = utils.firebase.db
+let auth = utils.firebase.auth
 let postsRef = db.ref('posts')
 
 export default {
@@ -34,7 +34,8 @@ export default {
         title: '',
         details: '',
         createdAt: new Date().getTime()
-      }
+      },
+      isLoginNeed: false
     }
   },
   firebase: {
@@ -42,14 +43,18 @@ export default {
   },
   methods: {
     addPost () {
-      if (this.post.title !== '') {
-        var newPostRef = postsRef.push()
-        console.log(this.post)
-        newPostRef.set(this.post)
-        this.post = {
-          title: '',
-          details: ''
+      console.log(auth.currentUser)
+      if (auth.currentUser) {
+        if (this.post.title !== '') {
+          var newPostRef = postsRef.push()
+          newPostRef.set(this.post)
+          this.post = {
+            title: '',
+            details: ''
+          }
         }
+      } else {
+        this.$emit('openLoginModal')
       }
     }
   }
